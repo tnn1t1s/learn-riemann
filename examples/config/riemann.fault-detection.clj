@@ -1,0 +1,47 @@
+(logging/init {:file "/var/log/riemann/riemann.log"})
+
+; Listen on all interfaces over TCP (5555), UDP (5555), and websockets
+; (5556)
+(let [host "0.0.0.0"]
+(tcp-server {:host host})
+(udp-server {:host host})
+(ws-server  {:host host}))
+
+; Expire old events from the index every 5 seconds.
+(periodically-expire 5)
+
+(def email (mailer {:from "reimann@example.com"}))
+
+; simple state change alert
+(let [index (index)]
+; Inbound events will be passed to these streams:
+(streams
+  (default :ttl 60
+      ; Index all events immediately.
+      index
+      
+      (changed-state {:init "ok"}
+        (email "james@example.com"))
+	
+	(changed-state {:init "ok"}
+	(stable 60 :state
+	(email "james@example.com")))))))
+
+http://kartar.net/2015/04/just-enough-clojure-for-riemann/
+
+Let’s try implementing this by ourselves, there is a bit of magic left here, call-rescue is an in-built function that will send our event to other streams you can think of it as a variant of map:
+
+1
+2
+3
+4
+5
+6
+(defn change-event [& children]
+  (fn [event]
+      (let [transformed-event (assoc event :hello :world)]
+            (call-rescue transformed-event children))))
+	     
+	     (streams (change-event prn))
+	     If this works then we should see an event printed out that has the “hello world” key-value pair in it. change-event is a stream handler that takes a list of “children” streams and returns a function that handles an event. If the function does not pass the event onto the children streams then the event stream stops processing, which is a bit like a filter. The event is really just a map of data like all good Clojure.
+
