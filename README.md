@@ -2,14 +2,28 @@
 
 learn you some Riemann.
 
-## Step 1. Install Riemann
+## Installing Riemann.
 
-Install Riemann as per http://riemann.io/quickstart.html
+Before getting started, you'll need to install Riemann as per http://riemann.io/quickstart.html
 
-##Step 2: Basics
-Start Riemman with the following command
+## The Basics
+Now you're ready to start Riemann. Riemann takes a Riemann config file as its first argument. The files is Clojure program that describes how to process Riemann events. In this section, we'll go through the basics of a Riemann config file. When we're done, you will be able to write your own basic configs.
 
-$ riemann examples/config/riemann-1.config.clj
+If you aren't familiar with Riemann, see
+ * https://github.com/aphyr/riemann
+
+You can start Riemann with the following command:
+
+$ riemann examples/config/riemann-1.config
+
+## Riemann Streams
+Restart Riemann with the following command:
+
+$ riemann examples/config/riemann-2.config
+
+This configuration file demonstrates the basics of Riemann streams. The Riemann engine applies each incoming event to a series of streams. 'streams' is a function that takes a variable number of arguments, each consisting of a function that accepts a map of events.
+
+## 
 
 ## License
 
