@@ -13,10 +13,12 @@ If you aren't familiar with Riemann, see
  * https://github.com/aphyr/riemann
 
 You can start Riemann with the following command:
+
 $ riemann examples/config/riemann-1.config
 
 ## Riemann Streams
 Restart Riemann with the following command:
+
 $ riemann examples/config/riemann-2.config
 
 This configuration file demonstrates the basics of Riemann streams. The Riemann engine applies each incoming event to a series of streams. 'streams' is a function that takes a variable number of arguments, each consisting of a function that accepts a map of events.
