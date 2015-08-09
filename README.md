@@ -1,2 +1,11 @@
 # learn-riemann
-learning and teaching Riemann
+
+learn you some Riemann.
+
+## Usage
+
+
+
+## License
+
+Copyright © 2015 DJP. Private Repository.
