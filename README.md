@@ -2,9 +2,12 @@
 
 learn you some Riemann.
 
-## Usage
+## Step 1. Install Riemann
+
+Install Riemann as per http://riemann.io/quickstart.html
 
 
+## Step 2: Start Riemman with examples/config/riemann-1.config.clj
 
 ## License
 
