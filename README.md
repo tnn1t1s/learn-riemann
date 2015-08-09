@@ -6,8 +6,10 @@ learn you some Riemann.
 
 Install Riemann as per http://riemann.io/quickstart.html
 
+##Step 2: Basics
+Start Riemman with the following command
 
-## Step 2: Start Riemman with examples/config/riemann-1.config.clj
+$ riemann examples/config/riemann-1.config.clj
 
 ## License
 
