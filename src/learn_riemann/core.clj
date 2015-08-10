@@ -11,10 +11,12 @@
 (def c (r/tcp-client {:host "127.0.0.1"}))
 
 ; send your first event
-(riemann-send c {:service "dz0" :state "ok" :metric 3.0})
+(riemann-send c {:service "dz0" :state "ok" :metric 90.0})
 
 ; query the index for the event
 @(r/query c "service = \"/xxx/yyy\"")
+@(r/query c "service = \"dz0-mean\"")
+@(r/query c "service = \"dz0.*\"")
 
 
 ; testing the where stream
