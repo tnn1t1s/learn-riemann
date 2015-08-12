@@ -14,10 +14,14 @@
 (riemann-send c {:service "dz0" :state "ok" :metric 90.0})
 (riemann-send c {:service "dz0" :state "error" :metric 90.0})
 
+; rieman-5
+(riemann-send c {:service "/count/me" :state "ok" :metric 90.0})
+
+
 ; query the index for the event
 @(r/query c "service = \"/xxx/yyy\"")
 @(r/query c "service = \"dz0-mean\"")
-@(r/query c "service = \"dz0\"")
+@(r/query c "service =~ \"/count/me%\"")
 @(r/query c "state = \"ok\"")
 
 
