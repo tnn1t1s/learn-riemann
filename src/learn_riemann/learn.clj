@@ -72,10 +72,19 @@
 
 
 
-(let [chimes (chime-ch [(-> 2 t/secs t/from-now)
-                                                (-> 3 t/secs t/from-now)])]
-    (a/<!! (go-loop []
-                               (when-let [msg (<! chimes)]
-                                              (prn "Chiming at:" msg)
-                                                           (recur)))))
+(defn riemann-synth [client intervals fx]
+  (let [
+      chimes (chime-ch
+               (take intervals (periodic-seq (t/now) (-> 1 t/seconds)))
+               )]
+  (a/<!! (go-loop [counter 1]
+                  (when-let [msg (<! chimes)]
+                    (riemann-send client {
+                                     :service "agent heartbeat"
+                                     :state "ok"
+                                     :host "a"
+                                     :metric (fx counter)})
+                    (recur (inc counter)))))))
+
+(riemann-synth c 10 #(+ 1 (Math/sin %)))
 
