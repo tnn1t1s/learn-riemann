@@ -4,11 +4,8 @@
         [chime :refer [chime-at chime-ch]]
         [clj-time.core :as t]
         [clj-time.periodic :refer [periodic-seq]]
-        [incanter.core :as incanter]
         [clojure.core.async :as a :refer [<! go-loop]]
-        [incanter.charts :as charts]
-        )
-      (:use [incanter core stats charts io]))
+        ))
 
 
 ;; getting events into riemann
@@ -31,7 +28,7 @@
 ; to cancel the schedule.
 ; (x)
 ; query the index to see results
-@(r/query c "service = \"dz0\"")
+@(r/query c "service = \"%\"")
 
 
 ; testing riemann-7.config
@@ -52,6 +49,7 @@
     (riemann-send c {:service "amem total" :state "ok" :metric 100.0}))))
 
 ;; testing coalesce
+(comment
 (def x (chime-at
   (take 100 (periodic-seq (t/now) (-> 1 t/seconds)))
   (fn [time]
@@ -69,10 +67,11 @@
   (fn [time]
     (riemann-send c {:service "agent heartbeat" :state "ok" :host "a" :metric 1.23})
     (riemann-send c {:service "agent heartbeat" :state "ok" :host "b" :metric 2.77}))))
+)
 
 
 
-(defn riemann-synth [client intervals fx]
+(defn riemann-synth [client service host intervals fx]
   (let [
       chimes (chime-ch
                (take intervals (periodic-seq (t/now) (-> 1 t/seconds)))
@@ -80,11 +79,16 @@
   (a/<!! (go-loop [counter 1]
                   (when-let [msg (<! chimes)]
                     (riemann-send client {
-                                     :service "agent heartbeat"
+                                     :service service 
                                      :state "ok"
-                                     :host "a"
+                                     :host host
                                      :metric (fx counter)})
                     (recur (inc counter)))))))
 
-(riemann-synth c 10 #(+ 1 (Math/sin %)))
+; generate a sin stream
+(riemann-synth c "agent" "a" 100 #(+ 1 (Math/sin %)))
+
+; triangles with amplitude 1 and period 10
+(riemann-synth c "agent" "b" 100 #(/ (mod % 10) 10))
+; random events with probability, p, and decay, t
 
