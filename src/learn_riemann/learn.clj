@@ -114,9 +114,10 @@
                                      (if (< 0.05 (rand)) 0 (* 5 (rand)))
                                      (Math/sin (* 0.25 %))))
 )
-(riemann-synth c "threshold" "b" 500 #(+ 1
+(riemann-synth c "threshold" "b" 50 #(+ 1
                                      (if (< 0.01 (rand)) 0 (* 5 (rand)))
                                      (Math/sin (* 0.25 %))))
+(riemann-synth c "threshold" "c" 100 #(+ 0 (random-metric 1.0 (/ % %)))) 
 
 ; now that we have created some anomolies, lets set about detecting them.
 ; the first approach, and the most naive, is to set a threshold and 
@@ -144,16 +145,23 @@
 
 ; really advanced
 ; FFT based techniques
+; we can take the windowed FFT and detect changes in frequency comoposition in time
+; or, set thresholds based on frequency range e.g. we don't expect high frequencies
+; in this stream e.g. noise.
 
 
 ; now, if P(x), the probability of encountering an anomoly is high, we may see several
 ; anomolies in a fixed time window. we have a few ways to deal with this.
 ; 1) mean over fixed time window
-; 2) flap detection
+; 2) flap detection e.g. stable
 ; and they have different purposes.
 
-; triangles with amplitude 1 and period 10
-;(riemann-synth c "agent" "b" 100 #(/ (mod % 10) 10))
+; testing : generate triangle waveshape with amplitude 1 and period 10
+(riemann-synth c "agent" "b" 100 #(/ (mod % 10) 10))
 
 ; random events with probability, p, and decay, t
+(defn random-metric [x range]
+  "generate a positive metric with P(x) and value in <0,range>"
+  (if (< x (rand)) 0 (* range (rand))))
+
 
