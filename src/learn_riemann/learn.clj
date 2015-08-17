@@ -7,6 +7,19 @@
         [clojure.core.async :as a :refer [<! go-loop]]
         ))
 
+; reference
+; http://www.nuxeo.com/blog/monitoring-nuxeo/
+; https://www.youtube.com/watch?v=czes-oa0yik&feature=youtu.be
+
+; chapter
+; measuring code w/ coda hale metrics and riemann
+; observe, orient, decide, react
+; what does it look like right now.
+; how does that compare historically.
+; do we need to do anything about it?
+; ok. lets do it.
+
+
 
 ;; getting events into riemann
 (defn riemann-send [c e]
@@ -43,10 +56,10 @@
 @(r/query c "service = \"mem used\"")
 @(r/query c "service = \"mem total\"")
 (def x (chime-at
-  (take 500 (periodic-seq (t/now) (-> 1 t/seconds)))
+  (take 1 (periodic-seq (t/now) (-> 1 t/seconds)))
   (fn [time]
-    (riemann-send c {:service "amem used" :state "ok" :metric (* 1.0 (rand 100))})
-    (riemann-send c {:service "amem total" :state "ok" :metric 100.0}))))
+    (riemann-send c {:service "mem used" :state "ok" :metric (* 1.0 (rand 100))})
+    (riemann-send c {:service "mem total" :state "ok" :metric 100.0}))))
 
 ;; testing coalesce
 (comment
@@ -85,10 +98,62 @@
                                      :metric (fx counter)})
                     (recur (inc counter)))))))
 
-; generate a sin stream
-(riemann-synth c "agent" "a" 100 #(+ 1 (Math/sin %)))
+; sin wave with period 
+;(riemann-synth c "agent" "a" 100 #(+ 1 (* 0.5 (Math/sin %)))))
+
+; sin wave with anomoly
+; Now, lets take the perfect sin wave and introduce an anomoly.
+; In the example below, we introduce a 0.1 probability of the 
+; metric having an anomoly with a uniform distribution from 0 to 5
+; Lets see what this looks like.
+(comment
+(riemann-synth c "agent" "a" 500 #(+ 1
+                                     (if (< 0.1 (rand)) 0 (* 5 (rand)))
+                                     (Math/sin (* 0.5 %))))
+(riemann-synth c "agent" "b" 500 #(+ 1
+                                     (if (< 0.05 (rand)) 0 (* 5 (rand)))
+                                     (Math/sin (* 0.25 %))))
+)
+(riemann-synth c "threshold" "b" 500 #(+ 1
+                                     (if (< 0.01 (rand)) 0 (* 5 (rand)))
+                                     (Math/sin (* 0.25 %))))
+
+; now that we have created some anomolies, lets set about detecting them.
+; the first approach, and the most naive, is to set a threshold and 
+; alert whenever the series crosses the threshold. 
+; in this example, we know the series should be within the range 0 to 1.
+; if the alert crosses this range, we should alert. In Riemann, we can 
+; detect this easily. code example in riemann-10
+; run this code and watch the dash, imagine getting pages everytime you
+; see the alert turn critical.
+; ideas; once it turns critical 5 times, leave it critical and then, only then, page.
+; (that's actually kind of logical)
+; http://riemann.io/howto.html#roll-up-and-throttle-events
+; 
+; this is sort of reasonable but falls apart when we try to use it in practice.
+; while we may know and understand the behavior of a small subset of metrics,
+; it is not practical to do this for all streams in our ecosystem.
+; lets try something slightly more advanced. 
+; statistic primer (mean, variance)
+; threshold on the standard deviation
+; http://dieter.plaetinck.be/post/practical-fault-detection-alerting-dont-need-to-be-data-scientist/
+; advanced techniques
+; MA crossing
+; STDDEV crossings
+; https://coderanger.net/talks/echo/
+
+; really advanced
+; FFT based techniques
+
+
+; now, if P(x), the probability of encountering an anomoly is high, we may see several
+; anomolies in a fixed time window. we have a few ways to deal with this.
+; 1) mean over fixed time window
+; 2) flap detection
+; and they have different purposes.
 
 ; triangles with amplitude 1 and period 10
-(riemann-synth c "agent" "b" 100 #(/ (mod % 10) 10))
+;(riemann-synth c "agent" "b" 100 #(/ (mod % 10) 10))
+
 ; random events with probability, p, and decay, t
 
