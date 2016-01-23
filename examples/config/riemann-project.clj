@@ -27,6 +27,8 @@
   (streams
     ; In this example, we use (project) to create a new service,
     ; /count/sum, composed of the sum of /count/a and /count/b
+    ; then, we check the maximum of this value of a fixed time window
+    ; and prn a new metric if the maximum exceeds some limit.
     (project [(service "/count/a")
               (service "/count/b")]
              (smap folds/sum
