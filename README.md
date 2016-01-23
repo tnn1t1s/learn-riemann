@@ -1,15 +1,15 @@
 # learn-riemann
 
-learn you some Riemann.
+me learning Riemann.
 
 ## Installing Riemann.
 
-Before getting started, you'll need to install Riemann as per http://riemann.io/quickstart.html
+Before getting started, install Riemann as per http://riemann.io/quickstart.html
 
 ## The Basics
-Now you're ready to start Riemann. Riemann takes a Riemann config file as its first argument. The files is Clojure program that describes how to process Riemann events. In this section, we'll go through the basics of a Riemann config file. When we're done, you will be able to write your own basic configs.
+Now start Riemann. Riemann takes a Riemann config file as its first argument. The files is Clojure program that describes how to process Riemann events. In this section, we'll go through the basics of a Riemann config file. When we're done, you will be able to write your own basic configs.
 
-If you aren't familiar with Riemann, see
+More about Riemann
  * https://github.com/aphyr/riemann
 
 You can start Riemann with the following command:
