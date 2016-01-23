@@ -22,7 +22,6 @@
 ; An incoming event is compared against each predicate; if it matches,
 ; the event replaces any previous event in that position and the
 ; entire vector of events is forwarded to all child streams.
-
 (let [my-index (index)
       index (update-index my-index)]
   (streams
@@ -31,4 +30,14 @@
     (project [(service "/count/a")
               (service "/count/b")]
              (smap folds/sum
-                   (with :service "/count/sum" index )))))
+                   (with :service "/count/sum"
+                     prn
+                     (fixed-time-window 3
+                       (combine folds/maximum
+                         (where (not (nil? event))
+                                (with :service "/count/fail"
+                                  (where (> metric 1.0)
+                                         prn))))))))))
+
+
+
