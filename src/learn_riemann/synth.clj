@@ -24,9 +24,8 @@
 
 ;;;; Riemann Synth
 
-;;; Riemann Synth generates signals for testing Riemann.
-;;; It is modeled after an old school analog synthesizer.
 (defn riemann-synth [client service host intervals fx]
+  "Riemann Synth generates signals for testing Riemann"
   (let [
       chimes (chime-ch
                (take intervals (periodic-seq (t/now) (-> 1 t/seconds)))
@@ -43,7 +42,6 @@
 ;;; Riemann Synth Helpers
 
 ;; random-metric
-;; generates random events with probability, p and decay, t
 (defn random-metric [x range]
   "generate a positive metric with P(x) and value in <0,range>"
   (if (< x (rand)) 0 (* range (rand))))
